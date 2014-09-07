@@ -7,7 +7,7 @@ Installation
 
 Either
 
-Download the zip file, unzip to give the moodle-atto_editor-chemistry folder. Rename this to chemistry and copy to the lib/editor/atto/plugins directory of your Moodle installation to give lib/editor/atto/plugins/chemistry
+Download the zip file, unzip to give the moodle-atto_editor-chemistry folder. Rename this to chemistry and copy to the lib/editor/atto/plugins folder of your Moodle installation to give lib/editor/atto/plugins/chemistry
 
 Or
 Navigate to the lib/editor/atto/plugins directory of your Moodle installation. Then isue the command
