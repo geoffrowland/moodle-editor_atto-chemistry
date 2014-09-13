@@ -89,10 +89,10 @@ X
 ^\circ 
 ^\circ C
 ^\circ F
-^\Theta 
 $\oplus$
 $\ominus$
-A/B
+\frac{1}{2}
+\frac{[A]}{[B]}
 \frac{[A][B]}{[C]}
 \frac{[A][B]}{[C][D]}
 $K_c$
@@ -103,13 +103,13 @@ $K$_{stab}
 \Delta${H_r}$
 \Delta${H_c}$
 \Delta${H_f}$
-\Delta${H^\Theta_r}$
-\Delta${H^\Theta_c}$
-\Delta${H^\Theta_f}$
+\Delta${H^\ominus_r}$
+\Delta${H^\ominus_c}$
+\Delta${H^\ominus_f}$
 \Delta${G}$
 $T$
 \Delta${S}$
-$E^\Theta$
+$E^\ominus$
 $A_r$
 $M_r$
 pH
@@ -186,7 +186,7 @@ $\downharpoonright$
 \mu
 \nu
 \xi
-o
+$o$
 \pi
 \varpi
 \rho
