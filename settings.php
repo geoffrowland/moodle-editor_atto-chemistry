@@ -109,7 +109,7 @@ ${K}$_{stab}
 \Delta${H}$^{\ominus}_{c}
 \Delta${H}$^{\ominus}_{f}
 \Delta${G}$
-$T$
+${T}$
 \Delta${S}$
 ${E}$^{\ominus}
 ${A}$_{r}
@@ -158,8 +158,8 @@ dm^{-3}
 <=>[][below]
 ^
 v
-$\upharpoonleft$
-$\downharpoonright$
+\upharpoonleft
+\downharpoonright
 ';
     $setting = new admin_setting_configtextarea('atto_chemistry/librarygroup3',
                                                 $name,
