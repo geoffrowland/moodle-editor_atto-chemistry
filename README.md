@@ -18,11 +18,11 @@ Then visit the Admin notifications page of your Moodle to complete the installat
 
 After installation you need to complete the following steps:
 
-1. Add chemistry to Administration > Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings > Toolbar config, to give, for example:
+Add chemistry to Administration > Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings > Toolbar config, to give, for example:
 
 insert = chemistry, equation, charmap, table, clear
 
-2. Add mhchem to the Moodle MathJax filter configuration
+Add mhchem to the Moodle MathJax filter configuration
 
 Edit Administration > Site administration > Plugins > Filters > MathJax > MathJax configuration to include:
 
