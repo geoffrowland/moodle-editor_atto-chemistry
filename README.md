@@ -16,7 +16,7 @@ git clone https://github.com/geoffrowland/moodle-editor_atto-chemistry.git chemi
 
 Then visit the Admin notifications page of your Moodle to complete the installation.
 
-After installation you need to complete the following steps
+After installation you need to complete the following steps:
 
 1. Add chemistry to Administration > Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings > Toolbar config, to give, for example:
 
