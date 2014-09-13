@@ -15,19 +15,25 @@ git clone https://github.com/geoffrowland/moodle-editor_atto-chemistry.git chemi
 
 Then visit the Admin notifications page of your Moodle to complete the installation.
 
-Copy flask.png and flask.svg from chemistry/pix/e/ to the pix/e/ folder of your Moodle installation.
+After installation you need to complete the following steps
 
-Add chemistry to Administration > Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings > Toolbar config, to give, for example:
+1. Add chemistry to Administration > Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings > Toolbar config, to give, for example:
 
-insert = chemistry, equation, mathslate, charmap, table, clear
+insert = chemistry, equation, charmap, table, clear
 
-Finally, add mhchem to the Moodle MathJax filter configuration
+2. Add mhchem to the Moodle MathJax filter configuration
 
 Edit Administration > Site administration > Plugins > Filters > MathJax > MathJax configuration to include:
 
 TeX: {
   extensions: ["mhchem.js","color.js","AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
 },
+
+You may need to Purge all caches on your Moodle server
+
+Administration > Site administration > Development > Purge all caches
+
+and in your browser
 
 Enjoy!
 
