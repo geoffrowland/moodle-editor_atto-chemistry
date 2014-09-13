@@ -172,6 +172,7 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             // Add the button to the toolbar.
             this.addButton({
                 icon: 'e/flask',
+                iconComponent: COMPONENTNAME,
                 callback: this._displayDialogue
             });
 
