@@ -26,8 +26,8 @@
     min-width: 206:px;
 }
 .atto_form {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 .atto_form .atto_chemistry_preview {
     margin-bottom: 0px; /* Turn off the margin-bottom from the class "well" */
