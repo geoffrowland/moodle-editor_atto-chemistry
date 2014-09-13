@@ -11,6 +11,7 @@ Download the zip file, unzip to give the moodle-atto_editor-chemistry folder. Re
 
 Or
 Navigate to the lib/editor/atto/plugins directory of your Moodle installation. Then isue the command
+
 git clone https://github.com/geoffrowland/moodle-editor_atto-chemistry.git chemistry.
 
 Then visit the Admin notifications page of your Moodle to complete the installation.
