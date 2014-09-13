@@ -392,7 +392,7 @@ I
 Xe
 Cs
 Ba
-$\dagger$
+\dagger
 Hf
 Ta
 W
@@ -410,7 +410,7 @@ At
 Rn
 Fr
 Ra
-$\ddagger$
+\ddagger
 Rf
 Db
 Sg
@@ -431,7 +431,7 @@ Cn
     $name = new lang_string('librarygroup7', 'atto_chemistry');
     $desc = new lang_string('librarygroup7_desc', 'atto_chemistry');
     $default = '
-$\dagger$
+\dagger
 La
 Ce
 Pr
@@ -449,7 +449,7 @@ Yb
 Lu
 
 
-$\ddagger$
+\ddagger
 Ac
 Th
 Pa
