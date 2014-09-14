@@ -105,11 +105,11 @@ ${K}$_{stab}
 \Delta${H}$_{r}
 \Delta${H}$_{c}
 \Delta${H}$_{f}
-\Delta${H}$^{\ominus)_{r}
+\Delta${H}$^{\ominus}_{r}
 \Delta${H}$^{\ominus}_{c}
 \Delta${H}$^{\ominus}_{f}
 \Delta${G}$
-$T$
+${T}$
 \Delta${S}$
 ${E}$^{\ominus}
 ${A}$_{r}
