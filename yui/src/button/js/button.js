@@ -37,6 +37,7 @@ var COMPONENTNAME = 'atto_chemistry',
     LOGNAME = 'atto_chemistry',
     CSS = {
         CHEMISTRY_TEXT: 'atto_chemistry_chemistry',
+        CHEMISTRY_LOADED: 'atto_chemistry_loaded',
         CHEMISTRY_PREVIEW: 'atto_chemistry_preview',
         SUBMIT: 'atto_chemistry_submit',
         LIBRARY: 'atto_chemistry_library',
@@ -47,6 +48,7 @@ var COMPONENTNAME = 'atto_chemistry',
         LIBRARY: '.' + CSS.LIBRARY,
         LIBRARY_GROUP: '.' + CSS.LIBRARY_GROUPS + ' > div > div',
         CHEMISTRY_TEXT: '.' + CSS.CHEMISTRY_TEXT,
+        CHEMISTRY_LOADED: '.' + CSS.CHEMISTRY_LOADED,
         CHEMISTRY_PREVIEW: '.' + CSS.CHEMISTRY_PREVIEW,
         SUBMIT: '.' + CSS.SUBMIT,
         LIBRARY_BUTTON: '.' + CSS.LIBRARY + ' button'
@@ -146,6 +148,33 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
     _groupFocus: null,
 
     /**
+     * A record of the last equation successfully loaded to preview.
+     *
+     * @property _previewDisplayed
+     * @type String
+     * @private
+     */
+    _previewDisplayed: null,
+
+    /**
+     * A flag to indicate that an Ajax response has been requested.
+     *
+     * @property _previewPending
+     * @type Boolean
+     * @private
+     */
+    _previewPending: false,
+
+    /**
+     * A record of displayed preview divs.
+     *
+     * @property _previewList
+     * @type Array
+     * @private
+     */
+    _previewList: [],
+
+    /**
      * Regular Expression patterns used to pick out the chemistrys in a String.
      *
      * @property _chemistryPatterns
@@ -155,13 +184,13 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
     _chemistryPatterns: [
         // We use space or not space because . does not match new lines.
         // $$\ce{ blah }$$.
-        /\$\$(\\ce{[\S\s]+?)}\$\$/,
+        /\$\$(\\ce\{[\S\s]+?)\}\$\$/,
         // E.g. "\(\ce{ blah }\)".
-        /\\\(\\ce{([\S\s]+?)}\\\)/,
+        /\\\(\\ce\{([\S\s]+?)\}\\\)/,
         // E.g. "\[\ce{ blah }\]".
-        /\\\[\\ce{([\S\s]+?)}\\\]/,
+        /\\\[\\ce\{([\S\s]+?)\}\\\]/,
         // E.g. "[tex]\ce{ blah }[/tex]".
-        /\[tex\]\\ce{([\S\s]+?)}\[\/tex\]/
+        /\[tex\]\\ce\{([\S\s]+?)\}\[\/tex\]/
     ],
 
     initializer: function() {
@@ -234,6 +263,7 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
         if (chemistry) {
             content.one(SELECTORS.CHEMISTRY_TEXT).set('text', chemistry);
         }
+        this._previewNode = this._content.one(SELECTORS.CHEMISTRY_PREVIEW);
         this._updatePreview(false);
     },
 
@@ -424,15 +454,18 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
         var textarea = this._content.one(SELECTORS.CHEMISTRY_TEXT),
             chemistry = textarea.get('value'),
             url,
-            preview,
             currentPos = textarea.get('selectionStart'),
             prefix = '',
             cursorLatex = '\\Downarrow ',
-            isChar,
             params;
 
         if (e) {
             e.preventDefault();
+        }
+
+        // If busy with previous request wait.
+        if (this._previewPending) {
+            return;
         }
 
         // Move the cursor so it does not break expressions.
@@ -441,23 +474,30 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             currentPos = 0;
         }
 
-        // First move back to the beginning of the line.
-        while (chemistry.charAt(currentPos) === '\\' && currentPos >= 0) {
-            currentPos -= 1;
+        // First move to the end of the TeX command word.
+        if (chemistry.substring(0,currentPos + 1).match(/\\[a-zA-Z]+$/)) {
+            currentPos += chemistry.substring(currentPos).match(/[a-zA-Z]*/)[0].length;
         }
-        isChar = /[a-zA-Z\{\}]/;
-        if (currentPos !== 0) {
-            // Now match to the end of the line.
-            while (isChar.test(chemistry.charAt(currentPos)) && currentPos < chemistry.length && isChar.test(chemistry.charAt(currentPos-1))) {
-                currentPos += 1;
-            }
-        }
+
         // Save the cursor position - for insertion from the library.
         this._lastCursorPos = currentPos;
         chemistry = prefix + chemistry.substring(0, currentPos) + cursorLatex + chemistry.substring(currentPos);
 
-        var previewNode = this._content.one(SELECTORS.CHEMISTRY_PREVIEW);
         chemistry = DELIMITERS.START + ' ' + chemistry + ' ' + DELIMITERS.END;
+
+        // If chemistry has not changed keep the old preview.
+        if (this._previewDisplayed === chemistry) {
+            return;
+        }
+
+        // If this has seen before, just display the cached result.
+        if (typeof this._previewList[chemistry] === 'Object') {
+            this.previewDisplayed = chemistry;
+            this._previewNode.appendChild(this._previewList[chemistry]);
+            node.all(SELECTORS.CHEMISTRY_LOADED).setStyle('display','none');
+            node.all(SELECTORS.CHEMISTRY_LOADED).pop.setStyle('display','inline');
+            return;
+        }
         // Make an ajax request to the filter.
         url = M.cfg.wwwroot + '/lib/editor/atto/plugins/chemistry/ajax.php';
         params = {
@@ -467,15 +507,56 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             text: chemistry
         };
 
-        preview = Y.io(url, {
-            sync: true,
-            data: params
+        this._previewPending = true;
+        Y.io(url, {
+            context: this,
+            data: params,
+            timeout: 300,
+            "arguments": chemistry,
+            on: {complete: this._loadPreview}
         });
+    },
 
+    /**
+     * Load returned preview text into div and append to preview.
+     *
+     * @param {String} id
+     * @param {EventFacade} e
+     * @param {String} chemistry
+     * @method _loadPreview
+     * @private
+     */
+    _loadPreview: function(id, preview, chemistry) {
         if (preview.status === 200) {
-            previewNode.setHTML(preview.responseText);
-            Y.fire(M.core.event.FILTER_CONTENT_UPDATED, {nodes: (new Y.NodeList(previewNode))});
+            var node = this._previewNode.appendChild(Y.Node.create(
+                '<span alt=" + chemistry + "></span>'
+            ));
+            node.setHTML(preview.responseText),
+            this._previewList[chemistry] = node;
+
+            Y.fire(M.core.event.FILTER_CONTENT_UPDATED, {nodes: (new Y.NodeList(node))});
+            node.setStyle('display', 'none');
+            if (node.one('img')) {
+                Y.io(node.one('img').getAttribute('src'), {
+                    context: this,
+                    on: {
+                        success: function () {
+                            node.addClass(CSS.CHEMISTRY_LOADED);
+                            this._previewNode.all(SELECTORS.CHEMISTRY_LOADED).setStyle('display','none');
+                            this._previewNode.all(SELECTORS.CHEMISTRY_LOADED).pop().setStyle('display','inline');
+                        }
+                    }
+                });
+            } else {
+                node.addClass(CSS.CHEMISTRY_LOADED);
+                this._previewNode.all(SELECTORS.CHEMISTRY_LOADED).setStyle('display','none');
+                this._previewNode.all(SELECTORS.CHEMISTRY_LOADED).pop().setStyle('display','inline');
+            }
+
+            this._previewDisplayed = chemistry;
         }
+        this._previewPending = false;
+        this._updatePreview();
     },
 
     /**
@@ -509,10 +590,18 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
         // Keyboard navigation in groups.
         this._content.delegate('key', this._groupNavigation, 'down:37,39', SELECTORS.LIBRARY_BUTTON, this);
 
+        var timer = null;
+        function throttledUpdate(e) {
+            var context = this;
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                context._updatePreview(e);
+            }, context.get('delay'));
+        }
         this._content.one(SELECTORS.SUBMIT).on('click', this._setChemistry, this);
-        this._content.one(SELECTORS.CHEMISTRY_TEXT).on('valuechange', this._throttle(this._updatePreview, 500), this);
-        this._content.one(SELECTORS.CHEMISTRY_TEXT).on('mouseup', this._throttle(this._updatePreview, 500), this);
-        this._content.one(SELECTORS.CHEMISTRY_TEXT).on('keyup', this._throttle(this._updatePreview, 500), this);
+        this._content.one(SELECTORS.CHEMISTRY_TEXT).on('valuechange', throttledUpdate, this);
+        this._content.one(SELECTORS.CHEMISTRY_TEXT).on('mouseup', throttledUpdate, this);
+        this._content.one(SELECTORS.CHEMISTRY_TEXT).on('keyup', throttledUpdate, this);
         this._content.delegate('click', this._selectLibraryItem, SELECTORS.LIBRARY_BUTTON, this);
 
         return this._content;
@@ -602,7 +691,7 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             newValue += ' ';
         }
         newValue += tex;
-        focusPoint = newValue.length;
+        focusPoint = newValue.length + 1;
 
         if (oldValue.charAt(this._lastCursorPos) !== ' ') {
             newValue += ' ';
@@ -714,6 +803,16 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
          */
         library: {
             value: {}
+        },
+
+        /**
+         * The number of microseconds to wait after input stops to update preview
+         *
+         * @attribute delay
+         * @type int
+         */
+        delay: {
+            value: null
         },
 
         /**

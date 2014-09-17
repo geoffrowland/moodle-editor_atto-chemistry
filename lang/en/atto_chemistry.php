@@ -24,6 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['delay'] = 'Delay before update';
+$string['delay_desc'] = 'The time in milliseconds that the editor will wait after input stops to update the preview. A value of 0 will update the preview continuously, but may cause excessive server load on busy sites.';
 $string['editchemistry'] = 'Edit chemistry using <a href="{$a}" target="_blank">TeX mhchem</a>';
 $string['librarygroup1'] = 'Formulae';
 $string['librarygroup1_desc'] = 'TeX commands listed on the formulae tab.';
