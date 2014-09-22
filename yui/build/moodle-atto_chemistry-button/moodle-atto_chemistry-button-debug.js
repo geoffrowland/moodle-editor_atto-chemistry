@@ -202,8 +202,8 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
         if (this.get('texfilteractive')) {
             // Add the button to the toolbar.
             this.addButton({
-                icon: 'e/flask',
-                //iconComponent: COMPONENTNAME,
+                icon: 'icon',
+                iconComponent: COMPONENTNAME,
                 callback: this._displayDialogue
             });
 
