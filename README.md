@@ -18,9 +18,7 @@ Then visit the Admin notifications page of your Moodle to complete the installat
 
 After installation you need to complete the following steps:
 
-Copy the flask image files from chemistry/pix/e/ to the core pix/e/ folder of your Moodle. This enables the flask icon to be available to the chemistry editor button ofthe Atto toolbar.
-
-Then add chemistry to Administration > Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings > Toolbar config, to give, for example:
+Add chemistry to Administration > Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings > Toolbar config, to give, for example:
 
 insert = chemistry, equation, charmap, table, clear
 
