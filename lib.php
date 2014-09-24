@@ -62,9 +62,8 @@ function atto_chemistry_params_for_js($elementid, $options, $fpoptions) {
     // If it is modified - we assume that some sort of text filter is working in this context.
     $result = format_text($texexample, true, $options);
     $texfilteractive = ($texexample !== $result);
-    // $texfilteractive = 1;
     $context = $options['context'];
-        if (!$context) {
+    if (!$context) {
         $context = context_system::instance();
     }
 
