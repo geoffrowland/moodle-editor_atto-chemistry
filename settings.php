@@ -30,7 +30,7 @@ $ADMIN->add('editoratto', new admin_category('atto_chemistry', new lang_string('
 
 $settings = new admin_settingpage('atto_chemistry_settings', new lang_string('settings', 'atto_chemistry'));
 if ($ADMIN->fulltree) {
-    // Group 1
+    // Group 1.
     $name = new lang_string('librarygroup1', 'atto_chemistry');
     $desc = new lang_string('librarygroup1_desc', 'atto_chemistry');
     $default = '
@@ -80,14 +80,14 @@ X
                                                 $default);
     $settings->add($setting);
 
-    // Group 2
+    // Group 2.
     $name = new lang_string('librarygroup2', 'atto_chemistry');
     $desc = new lang_string('librarygroup2_desc', 'atto_chemistry');
     $default = '
 .
 :
 \circ
-{}^{\circ} 
+{}^{\circ}
 ^{\circ}C
 ^{\circ}F
 \oplus
@@ -129,7 +129,7 @@ dm^{-3}
                                                 $default);
     $settings->add($setting);
 
-    // Group 3
+    // Group 3.
     $name = new lang_string('librarygroup3', 'atto_chemistry');
     $desc = new lang_string('librarygroup3_desc', 'atto_chemistry');
     $default = '
@@ -167,7 +167,7 @@ v
                                                 $default);
     $settings->add($setting);
 
-    // Group 4
+    // Group 4.
     $name = new lang_string('librarygroup4', 'atto_chemistry');
     $desc = new lang_string('librarygroup4_desc', 'atto_chemistry');
     $default = '
@@ -233,7 +233,7 @@ X
                                                 $default);
     $settings->add($setting);
 
-// Group 5
+    // Group 5.
     $name = new lang_string('librarygroup5', 'atto_chemistry');
     $desc = new lang_string('librarygroup5_desc', 'atto_chemistry');
     $default = '
@@ -296,7 +296,7 @@ ${Z}$
                                                 $default);
     $settings->add($setting);
 
-// Group 6
+    // Group 6.
     $name = new lang_string('librarygroup6', 'atto_chemistry');
     $desc = new lang_string('librarygroup6_desc', 'atto_chemistry');
     $default = '
@@ -427,7 +427,7 @@ Cn
                                                 $default);
     $settings->add($setting);
 
-// Group 7
+    // Group 7.
     $name = new lang_string('librarygroup7', 'atto_chemistry');
     $desc = new lang_string('librarygroup7_desc', 'atto_chemistry');
     $default = '
@@ -477,5 +477,4 @@ Lr
             new lang_string('delay_desc', 'atto_chemistry'),
             '100', PARAM_INT);
     $settings->add($setting);
-
 }
