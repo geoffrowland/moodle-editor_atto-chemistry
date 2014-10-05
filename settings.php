@@ -156,8 +156,8 @@ dm^{-3}
 <=>[above]
 <=>[above][below]
 <=>[][below]
-^
-v
+\uparrow
+\downarrow
 \upharpoonleft
 \downharpoonright
 ';
