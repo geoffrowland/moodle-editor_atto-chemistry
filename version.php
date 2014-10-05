@@ -28,4 +28,4 @@ $plugin->version   = 2014100500;        // The current plugin version (Date: YYY
 $plugin->requires  = 2014050800;        // Requires this Moodle version.
 $plugin->component = 'atto_chemistry';  // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE; // Stable release.
-$plugin->release = 'v2.7-1'; // This is the first stable release for the Moodle 2.7.x branch.
+$plugin->release = 'v2.7-2'; // This is the second stable release for the Moodle 2.7.x branch.
