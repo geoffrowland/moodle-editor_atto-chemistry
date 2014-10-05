@@ -689,15 +689,17 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
         oldValue = input.get('value');
 
         newValue = oldValue.substring(0, this._lastCursorPos);
-        if (newValue.charAt(newValue.length - 1) !== ' ') {
+        if (newValue.length && /\\[a-zA-Z]*$/.test(newValue) ) {
             newValue += ' ';
         }
         newValue += tex;
-        focusPoint = newValue.length + 1;
 
-        if (oldValue.charAt(this._lastCursorPos) !== ' ') {
+
+        if ((oldValue.charAt(this._lastCursorPos) !== ' ') && /\\[a-zA-Z]*$/.test(newValue)) {
             newValue += ' ';
         }
+        focusPoint = newValue.length;
+
         newValue += oldValue.substring(this._lastCursorPos, oldValue.length);
 
         input.set('value', newValue);
