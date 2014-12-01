@@ -1,7 +1,7 @@
 moodle-editor_atto-chemistry
 ============================
 
-Chemistry equation editor for Moodle using the mhchem TeX extension in MathJax
+Chemistry equation editor for Moodle using the mhchem extension in MathJax/TeX
 
 Installation
 
@@ -27,7 +27,7 @@ Add mhchem to the Moodle MathJax filter configuration
 Edit Administration > Site administration > Plugins > Filters > MathJax > MathJax configuration to include:
 
 TeX: {
-  extensions: ["mhchem.js","color.js","AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js"]
+  extensions: ["AMSmath.js","AMSsymbols.js","color.js","mhchem.js","noErrors.js","noUndefined.js"]
 },
 
 You may need to Purge all caches on your Moodle server

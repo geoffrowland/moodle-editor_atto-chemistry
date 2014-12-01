@@ -67,7 +67,7 @@ function atto_chemistry_params_for_js($elementid, $options, $fpoptions) {
         $context = context_system::instance();
     }
 
-    // Tex example librarys.
+    // Tex example libraries.
     $library = array(
             'group1' => array(
                 'groupname' => 'librarygroup1',

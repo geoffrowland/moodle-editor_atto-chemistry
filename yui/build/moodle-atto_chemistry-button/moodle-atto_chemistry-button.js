@@ -56,8 +56,8 @@ var COMPONENTNAME = 'atto_chemistry',
         LIBRARY_BUTTON: '.' + CSS.LIBRARY + ' button'
     },
     DELIMITERS = {
-        START: '\\(\\ce{',
-        END: '}\\)'
+        START: '\\(\\ce{ ',
+        END: ' }\\)'
     },
     TEMPLATES = {
         FORM: '' +
@@ -295,7 +295,7 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             return false;
         }
 
-        // We don't yet have a cursor selection somehow so we can't possible be resolving an chemistry that has selection.
+        // We don't yet have a cursor selection somehow so we can't possibly be resolving a chemistry equation that has selection.
         if (!selection || selection.length === 0) {
             return false;
         }
@@ -306,9 +306,9 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
 
         text = Y.one(selectedNode).get('text');
 
-        // For each of these patterns we have a RegExp which captures the inner component of the chemistry but also includes the delimiters.
+        // For each of these patterns we have a RegExp which captures the inner component of the chemistry equation but also includes the delimiters.
         // We first run the RegExp adding the global flag ("g"). This ignores the capture, instead matching the entire
-        // chemistry including delimiters and returning one entry per match of the whole chemistry.
+        // chemistry equation including delimiters and returning one entry per match of the whole chemistry.
         // We have to deal with multiple occurences of the same chemistry in a String so must be able to loop on the
         // match results.
         Y.Array.find(this._chemistryPatterns, function(pattern) {
@@ -375,7 +375,7 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
     },
 
     /**
-     * Handle insertion of a new chemistry, or update of an existing one.
+     * Handle insertion of a new chemistry equation, or update of an existing one.
      *
      * @method _setChemistry
      * @param {EventFacade} e
@@ -458,7 +458,7 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             url,
             currentPos = textarea.get('selectionStart'),
             prefix = '',
-            cursorLatex = '\\Downarrow ',
+            cursorLatex = '$\\Downarrow$ ',
             params;
 
         if (e) {
@@ -627,6 +627,7 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             nextButton;
 
         if (index < 0) {
+            Y.log('Unable to find the current button in the list of buttons', 'debug', LOGNAME);
             index = 0;
         }
 
@@ -688,16 +689,36 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
         oldValue = input.get('value');
 
         newValue = oldValue.substring(0, this._lastCursorPos);
-        if (newValue.length && /\\[a-zA-Z]*$/.test(newValue) ) {
-            newValue += ' ';
+
+        // Remove ] and [ from TeX space buttons.
+        tex = tex.replace('$\]','$');
+        tex = tex.replace('\[$','$');
+
+        // Add space after negative ions.
+        if (/[a-zA-Z]+[\^\d]*\-/.test(tex)) {
+          tex += ' ';
+        }
+
+        // Add any necessary spaces before and after input from button.
+        if (newValue.charAt(newValue.length - 1) !== ' ') {
+	        // Wrap arrows with spaces.
+			if (/v$/.test(tex) || /\^$/.test(tex) || /^</.test(tex) || /^->/.test(tex) || /^v\s/.test(tex) || /^\^\s/.test(tex) || /\}\]$/.test(newValue) || />$/.test(newValue)){
+                newValue += ' ';
+		    }
+		    // If required, inserts space between \bond{} instances.
+		    if (/^\\bond\{.{1,4}\}/.test(tex) && /\\bond\{.{1,4}\}$/.test(newValue)) {
+				newValue += ' ';
+		    }
         }
         newValue += tex;
-
-
-        if ((oldValue.charAt(this._lastCursorPos) !== ' ') && /\\[a-zA-Z]*$/.test(newValue)) {
-            newValue += ' ';
+        focusPoint = newValue.length + 1;
+        
+        // Adds space after tex insert, before cursor.
+        if (oldValue.charAt(this._lastCursorPos) !== ' ') {
+			if (/\sv$/.test(newValue) || /\s\^$/.test(newValue) || /\}\]$/.test(newValue) || />$/.test(newValue)) {
+                newValue += ' ';
+		    }
         }
-        focusPoint = newValue.length;
 
         newValue += oldValue.substring(this._lastCursorPos, oldValue.length);
 
@@ -736,6 +757,7 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
                 current,
                 out;
             if (typeof delimiter === "undefined" || typeof str === "undefined") {
+                Y.log('Handlebars split helper: String and delimiter are required.', 'debug', 'moodle-atto_chemistry-button');
                 return '';
             }
 
