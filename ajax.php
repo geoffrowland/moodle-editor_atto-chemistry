@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renders text with the active filters and returns it. 
- * Used to create previews of chemistry equtionsusing whatever tex filters are enabled.
+ * Renders text with the active filters and returns it.
+ * Used to create previews of chemistry equtions using whatever tex filters are enabled.
  *
  * @package    atto_chemistry
  * @copyright  2014 Geoffrey Rowland <rowland.geoff@gmail.com>

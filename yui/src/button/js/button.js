@@ -37,7 +37,6 @@ var COMPONENTNAME = 'atto_chemistry',
     LOGNAME = 'atto_chemistry',
     CSS = {
         CHEMISTRY_TEXT: 'atto_chemistry_chemistry',
-        CHEMISTRY_LOADED: 'atto_chemistry_loaded',
         CHEMISTRY_PREVIEW: 'atto_chemistry_preview',
         SUBMIT: 'atto_chemistry_submit',
         LIBRARY: 'atto_chemistry_library',
@@ -48,7 +47,6 @@ var COMPONENTNAME = 'atto_chemistry',
         LIBRARY: '.' + CSS.LIBRARY,
         LIBRARY_GROUP: '.' + CSS.LIBRARY_GROUPS + ' > div > div',
         CHEMISTRY_TEXT: '.' + CSS.CHEMISTRY_TEXT,
-        CHEMISTRY_LOADED: '.' + CSS.CHEMISTRY_LOADED,
         CHEMISTRY_PREVIEW: '.' + CSS.CHEMISTRY_PREVIEW,
         SUBMIT: '.' + CSS.SUBMIT,
         LIBRARY_BUTTON: '.' + CSS.LIBRARY + ' button'
@@ -62,9 +60,11 @@ var COMPONENTNAME = 'atto_chemistry',
             '<form class="atto_form">' +
                 '{{{library}}}' +
                 '<label for="{{elementid}}_{{CSS.CHEMISTRY_TEXT}}">{{{get_string "editchemistry" component texdocsurl}}}</label>' +
-                '<textarea class="fullwidth {{CSS.CHEMISTRY_TEXT}}" id="{{elementid}}_{{CSS.CHEMISTRY_TEXT}}" rows="8"></textarea><br/>' +
+                '<textarea class="fullwidth {{CSS.CHEMISTRY_TEXT}}" ' +
+                        'id="{{elementid}}_{{CSS.CHEMISTRY_TEXT}}" rows="8"></textarea><br/>' +
                 '<label for="{{elementid}}_{{CSS.CHEMISTRY_PREVIEW}}">{{get_string "preview" component}}</label>' +
-                '<div describedby="{{elementid}}_cursorinfo" class="well well-small fullwidth {{CSS.CHEMISTRY_PREVIEW}}" id="{{elementid}}_{{CSS.CHEMISTRY_PREVIEW}}"></div>' +
+                '<div describedby="{{elementid}}_cursorinfo" class="well well-small fullwidth {{CSS.CHEMISTRY_PREVIEW}}" ' +
+                        'id="{{elementid}}_{{CSS.CHEMISTRY_PREVIEW}}"></div>' +
                 '<div id="{{elementid}}_cursorinfo">{{get_string "cursorinfo" component}}</div>' +
                 '<div class="mdl-align">' +
                     '<br/>' +
@@ -148,33 +148,6 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
     _groupFocus: null,
 
     /**
-     * A record of the last equation successfully loaded to preview.
-     *
-     * @property _previewDisplayed
-     * @type String
-     * @private
-     */
-    _previewDisplayed: null,
-
-    /**
-     * A flag to indicate that an Ajax response has been requested.
-     *
-     * @property _previewPending
-     * @type Boolean
-     * @private
-     */
-    _previewPending: false,
-
-    /**
-     * A record of displayed preview divs.
-     *
-     * @property _previewList
-     * @type Array
-     * @private
-     */
-    _previewList: [],
-
-    /**
      * Regular Expression patterns used to pick out the chemistrys in a String.
      *
      * @property _chemistryPatterns
@@ -216,7 +189,9 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
 
             // We need to convert these to a non dom node based format.
             this.editor.all('tex').each(function (texNode) {
-                var replacement = Y.Node.create('<span>' + DELIMITERS.START + ' ' + texNode.get('text') + ' ' + DELIMITERS.END + '</span>');
+                var replacement = Y.Node.create('<span>' +
+                        DELIMITERS.START + ' ' + texNode.get('text') + ' ' + DELIMITERS.END +
+                        '</span>');
                 texNode.replace(replacement);
             });
         }
@@ -263,7 +238,6 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
         if (chemistry) {
             content.one(SELECTORS.CHEMISTRY_TEXT).set('text', chemistry);
         }
-        this._previewNode = this._content.one(SELECTORS.CHEMISTRY_PREVIEW);
         this._updatePreview(false);
     },
 
@@ -304,9 +278,10 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
 
         text = Y.one(selectedNode).get('text');
 
-        // For each of these patterns we have a RegExp which captures the inner component of the chemistry equation but also includes the delimiters.
+        // For each of these patterns we have a RegExp which captures the inner component of the chemistry equation but also
+        // includes the delimiters.
         // We first run the RegExp adding the global flag ("g"). This ignores the capture, instead matching the entire
-        // chemistry equation including delimiters and returning one entry per match of the whole chemistry.
+        // chemistry equation including delimiters and returning one entry per match of the whole chemistry equation.
         // We have to deal with multiple occurences of the same chemistry in a String so must be able to loop on the
         // match results.
         Y.Array.find(this._chemistryPatterns, function(pattern) {
@@ -384,7 +359,8 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             selectedNode,
             text,
             value,
-            host;
+            host,
+            newText;
 
         host = this.get('host');
 
@@ -456,16 +432,12 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             url,
             currentPos = textarea.get('selectionStart'),
             prefix = '',
-            cursorLatex = '\\Downarrow ',
+            cursorLatex = '$\\Downarrow$ ',
+            isChar,
             params;
 
         if (e) {
             e.preventDefault();
-        }
-
-        // If busy with previous request wait.
-        if (this._previewPending) {
-            return;
         }
 
         // Move the cursor so it does not break expressions.
@@ -474,30 +446,24 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             currentPos = 0;
         }
 
-        // First move to the end of the TeX command word.
-        if (chemistry.substring(0,currentPos + 1).match(/\\[a-zA-Z]+$/)) {
-            currentPos += chemistry.substring(currentPos).match(/[a-zA-Z]*/)[0].length;
+        // First move back to the beginning of the line.
+        while (chemistry.charAt(currentPos) === '\\' && currentPos >= 0) {
+            currentPos -= 1;
         }
-
+        isChar = /[a-zA-Z\{\}]/;
+        if (currentPos !== 0) {
+            // Now match to the end of the line.
+            while (isChar.test(chemistry.charAt(currentPos)) &&
+                   currentPos < chemistry.length &&
+                   isChar.test(chemistry.charAt(currentPos-1))) {
+                currentPos += 1;
+            }
+        }
         // Save the cursor position - for insertion from the library.
         this._lastCursorPos = currentPos;
         chemistry = prefix + chemistry.substring(0, currentPos) + cursorLatex + chemistry.substring(currentPos);
 
         chemistry = DELIMITERS.START + ' ' + chemistry + ' ' + DELIMITERS.END;
-
-        // If chemistry has not changed keep the old preview.
-        if (this._previewDisplayed === chemistry) {
-            return;
-        }
-
-        // If this has seen before, just display the cached result.
-        if (typeof this._previewList[chemistry] === 'Object') {
-            this.previewDisplayed = chemistry;
-            this._previewNode.appendChild(this._previewList[chemistry]);
-            node.all(SELECTORS.CHEMISTRY_LOADED).setStyle('display','none');
-            node.all(SELECTORS.CHEMISTRY_LOADED).pop.setStyle('display','inline');
-            return;
-        }
         // Make an ajax request to the filter.
         url = M.cfg.wwwroot + '/lib/editor/atto/plugins/chemistry/ajax.php';
         params = {
@@ -507,56 +473,32 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             text: chemistry
         };
 
-        this._previewPending = true;
         Y.io(url, {
             context: this,
             data: params,
-            timeout: 300,
-            "arguments": chemistry,
-            on: {complete: this._loadPreview}
+            timeout: 500,
+            on: {
+                complete: this._loadPreview
+            }
         });
     },
 
     /**
-     * Load returned preview text into div and append to preview.
+     * Load returned preview text into preview
      *
      * @param {String} id
      * @param {EventFacade} e
-     * @param {String} chemistry
      * @method _loadPreview
      * @private
      */
-    _loadPreview: function(id, preview, chemistry) {
+    _loadPreview: function(id, preview) {
+        var previewNode = this._content.one(SELECTORS.CHEMISTRY_PREVIEW);
+
         if (preview.status === 200) {
-            var node = this._previewNode.appendChild(Y.Node.create(
-                '<span alt=" + chemistry + "></span>'
-            ));
-            node.setHTML(preview.responseText),
-            this._previewList[chemistry] = node;
+            previewNode.setHTML(preview.responseText);
 
-            Y.fire(M.core.event.FILTER_CONTENT_UPDATED, {nodes: (new Y.NodeList(node))});
-            node.setStyle('display', 'none');
-            if (node.one('img')) {
-                Y.io(node.one('img').getAttribute('src'), {
-                    context: this,
-                    on: {
-                        success: function () {
-                            node.addClass(CSS.CHEMISTRY_LOADED);
-                            this._previewNode.all(SELECTORS.CHEMISTRY_LOADED).setStyle('display','none');
-                            this._previewNode.all(SELECTORS.CHEMISTRY_LOADED).pop().setStyle('display','inline');
-                        }
-                    }
-                });
-            } else {
-                node.addClass(CSS.CHEMISTRY_LOADED);
-                this._previewNode.all(SELECTORS.CHEMISTRY_LOADED).setStyle('display','none');
-                this._previewNode.all(SELECTORS.CHEMISTRY_LOADED).pop().setStyle('display','inline');
-            }
-
-            this._previewDisplayed = chemistry;
+            Y.fire(M.core.event.FILTER_CONTENT_UPDATED, {nodes: (new Y.NodeList(previewNode))});
         }
-        this._previewPending = false;
-        this._updatePreview();
     },
 
     /**
@@ -569,6 +511,7 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
      */
     _getDialogueContent: function() {
         var library = this._getLibraryContent(),
+            throttledUpdate = this._throttle(this._updatePreview, 500),
             template = Y.Handlebars.compile(TEMPLATES.FORM);
 
         this._content = Y.Node.create(template({
@@ -590,14 +533,6 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
         // Keyboard navigation in groups.
         this._content.delegate('key', this._groupNavigation, 'down:37,39', SELECTORS.LIBRARY_BUTTON, this);
 
-        var timer = null;
-        function throttledUpdate(e) {
-            var context = this;
-            clearTimeout(timer);
-            timer = setTimeout(function () {
-                context._updatePreview(e);
-            }, context.get('delay'));
-        }
         this._content.one(SELECTORS.SUBMIT).on('click', this._setChemistry, this);
         this._content.one(SELECTORS.CHEMISTRY_TEXT).on('valuechange', throttledUpdate, this);
         this._content.one(SELECTORS.CHEMISTRY_TEXT).on('mouseup', throttledUpdate, this);
@@ -717,7 +652,6 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
                 newValue += ' ';
 		    }
         }
-
         newValue += oldValue.substring(this._lastCursorPos, oldValue.length);
 
         input.set('value', newValue);
@@ -784,7 +718,7 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
             text: content
         };
 
-        preview = Y.io(url, {
+        var preview = Y.io(url, {
             sync: true,
             data: params,
             method: 'POST'
@@ -825,16 +759,6 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
          */
         library: {
             value: {}
-        },
-
-        /**
-         * The number of microseconds to wait after input stops to update preview
-         *
-         * @attribute delay
-         * @type int
-         */
-        delay: {
-            value: null
         },
 
         /**
