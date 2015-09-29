@@ -75,7 +75,9 @@ var COMPONENTNAME = 'atto_chemistry',
             '<div class="{{CSS.LIBRARY}}">' +
                 '<ul>' +
                     '{{#each library}}' +
-                        '<li><a href="#{{../elementid}}_{{../CSS.LIBRARY_GROUP_PREFIX}}_{{@key}}">' +
+                        '<li><a aria-label="{{get_string grouptitle ../component}}" ' +
+                        'title="{{get_string grouptitle ../component}}" ' +
+                        'href="#{{../elementid}}_{{../CSS.LIBRARY_GROUP_PREFIX}}_{{@key}}">' +
                             '{{get_string groupname ../component}}' +
                         '</a></li>' +
                     '{{/each}}' +
@@ -634,23 +636,23 @@ Y.namespace('M.atto_chemistry').Button = Y.Base.create('button', Y.M.editor_atto
 
         // Add any necessary spaces before and after input from button.
         if (newValue.charAt(newValue.length - 1) !== ' ') {
-	        // Wrap arrows with spaces.
-			if (/v$/.test(tex) || /\^$/.test(tex) || /^</.test(tex) || /^->/.test(tex) || /^v\s/.test(tex) || /^\^\s/.test(tex) || /\}\]$/.test(newValue) || />$/.test(newValue)){
+            // Wrap arrows with spaces.
+            if (/v$/.test(tex) || /\^$/.test(tex) || /^</.test(tex) || /^->/.test(tex) || /^v\s/.test(tex) || /^\^\s/.test(tex) || /\}\]$/.test(newValue) || />$/.test(newValue)){
                 newValue += ' ';
-		    }
-		    // If required, inserts space between \bond{} instances.
-		    if (/^\\bond\{.{1,4}\}/.test(tex) && /\\bond\{.{1,4}\}$/.test(newValue)) {
-				newValue += ' ';
-		    }
+            }
+            // If required, inserts space between \bond{} instances.
+            if (/^\\bond\{.{1,4}\}/.test(tex) && /\\bond\{.{1,4}\}$/.test(newValue)) {
+                newValue += ' ';
+            }
         }
         newValue += tex;
         focusPoint = newValue.length + 1;
 
         // Add space after tex insert, before cursor.
         if (oldValue.charAt(this._lastCursorPos) !== ' ') {
-			if (/\sv$/.test(newValue) || /\s\^$/.test(newValue) || /\}\]$/.test(newValue) || />$/.test(newValue)) {
+            if (/\sv$/.test(newValue) || /\s\^$/.test(newValue) || /\}\]$/.test(newValue) || />$/.test(newValue)) {
                 newValue += ' ';
-		    }
+            }
         }
         newValue += oldValue.substring(this._lastCursorPos, oldValue.length);
 

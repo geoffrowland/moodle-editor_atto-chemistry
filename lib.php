@@ -44,7 +44,14 @@ function atto_chemistry_strings_for_js() {
                                           'librarygroup4',
                                           'librarygroup5',
                                           'librarygroup6',
-                                          'librarygroup7'),
+                                          'librarygroup7',
+                                          'librarygroup1_title',
+                                          'librarygroup2_title',
+                                          'librarygroup3_title',
+                                          'librarygroup4_title',
+                                          'librarygroup5_title',
+                                          'librarygroup6_title',
+                                          'librarygroup7_title'),
                                     'atto_chemistry');
 }
 
@@ -71,30 +78,37 @@ function atto_chemistry_params_for_js($elementid, $options, $fpoptions) {
     $library = array(
             'group1' => array(
                 'groupname' => 'librarygroup1',
+                'grouptitle' => 'librarygroup1_title',
                 'elements' => get_config('atto_chemistry', 'librarygroup1'),
             ),
             'group2' => array(
                 'groupname' => 'librarygroup2',
+                'grouptitle' => 'librarygroup2_title',
                 'elements' => get_config('atto_chemistry', 'librarygroup2'),
             ),
             'group3' => array(
                 'groupname' => 'librarygroup3',
+                'grouptitle' => 'librarygroup3_title',
                 'elements' => get_config('atto_chemistry', 'librarygroup3'),
             ),
             'group4' => array(
                 'groupname' => 'librarygroup4',
+                'grouptitle' => 'librarygroup4_title',
                 'elements' => get_config('atto_chemistry', 'librarygroup4'),
             ),
             'group5' => array(
                 'groupname' => 'librarygroup5',
+                'grouptitle' => 'librarygroup5_title',
                 'elements' => get_config('atto_chemistry', 'librarygroup5'),
             ),
             'group6' => array(
                 'groupname' => 'librarygroup6',
+                'grouptitle' => 'librarygroup6_title',
                 'elements' => get_config('atto_chemistry', 'librarygroup6'),
             ),
             'group7' => array(
                 'groupname' => 'librarygroup7',
+                'grouptitle' => 'librarygroup7_title',
                 'elements' => get_config('atto_chemistry', 'librarygroup7'),
             ));
 
