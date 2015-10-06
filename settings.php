@@ -84,8 +84,8 @@ X
 :
 $.$
 $\circ$
-{}^{$\circ$}C
-{}^{$\circ$}F
+{\:}^{$\circ$}C
+{\:}^{$\circ$}F
 $\oplus$
 $\ominus$
 1/2
