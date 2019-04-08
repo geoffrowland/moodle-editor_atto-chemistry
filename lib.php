@@ -117,3 +117,12 @@ function atto_chemistry_params_for_js($elementid, $options, $fpoptions) {
                  'library' => $library,
                  'texdocsurl' => get_docs_url('Chemistry_notation_using_mhchem'));
 }
+
+/**
+ * Get icon mapping for font-awesome.
+ */
+function atto_chemistry_get_fontawesome_icon_map() {
+    return [
+        'atto_chemistry:icon' => 'fa-flask'
+    ];
+}
